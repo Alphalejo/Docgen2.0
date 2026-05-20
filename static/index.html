@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document Builder</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="left-panel">
+            <h2>Live Preview</h2>
+            <iframe id="preview-frame"></iframe>
+        </div>
+        
+        <div class="right-panel">
+            <div class="right-header">
+                <h2>Document Builder</h2>
+                <div class="controls-top">
+                    <select id="template-select" style="flex: 2;"></select>
+                    <div class="file-upload-wrapper">
+                        <button class="btn-outline">Load JSON</button>
+                        <input type="file" id="json-upload" accept=".json">
+                    </div>
+                </div>
+            </div>
+
+            <div class="scrollable-form">
+                <form id="dynamic-form"></form>
+            </div>
+
+            <div class="actions-bottom">
+                <button class="btn-primary" id="btn-preview">Force Preview Refresh</button>
+                <div class="btn-row">
+                    <button class="btn-success" id="btn-pdf">Download PDF</button>
+                    <button class="btn-success" id="btn-docx">Download DOCX</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="/static/main.js"></script>
+</body>
+</html>

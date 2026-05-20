@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Report</title>
+<style>
+    body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; margin: 40px; line-height: 1.6; color: #2c3e50; }
+    h1 { color: #2980b9; border-bottom: 2px solid #3498db; padding-bottom: 10px; margin-top: 0; }
+    .meta { font-style: italic; color: #7f8c8d; margin-bottom: 30px; border-left: 4px solid #bdc3c7; padding-left: 10px; }
+    h2 { color: #34495e; margin-top: 30px; font-size: 1.4em; }
+    .box { background: #ecf0f1; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
+    .metrics { font-family: monospace; background: #fff; padding: 15px; border: 1px solid #bdc3c7; white-space: pre-wrap; }
+</style>
+</head>
+<body>
+    <h1>{{ title | default('Monthly Report') }}</h1>
+    
+    <div class="meta">
+        <strong>Prepared by:</strong> {{ author | default('Author Name') }}<br>
+        <strong>Date:</strong> {{ date | default('YYYY-MM-DD') }}
+    </div>
+
+    <h2>Executive Summary</h2>
+    <div class="box">
+        {{ summary | default('Enter your executive summary here...') | replace('\n', '<br>') | safe }}
+    </div>
+
+    <h2>Key Metrics</h2>
+    <div class="metrics">{{ metrics | default('Metrics data goes here...') }}</div>
+</body>
+</html>

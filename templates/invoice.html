@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Invoice</title>
+<style>
+    body { font-family: Arial, sans-serif; margin: 40px; color: #333; line-height: 1.5; }
+    .header { text-align: center; border-bottom: 2px solid #333; padding-bottom: 15px; margin-bottom: 30px; }
+    .header h1 { margin: 0; font-size: 32px; letter-spacing: 2px; }
+    .header h2 { margin: 5px 0 0 0; font-size: 20px; font-weight: normal; color: #555; }
+    .details { margin-bottom: 30px; }
+    .details div { margin-bottom: 8px; }
+    .amount-total { font-size: 20px; font-weight: bold; color: #2c3e50; margin-top: 20px; text-align: right; }
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
+    th { background-color: #f4f4f4; }
+</style>
+</head>
+<body>
+    <div class="header">
+        <h1>INVOICE</h1>
+        <h2>{{ company_name | default('Your Company') }}</h2>
+    </div>
+    <div class="details">
+        <div><strong>Invoice #:</strong> {{ invoice_number | default('INV-000') }}</div>
+        <div><strong>Date:</strong> {{ date | default('YYYY-MM-DD') }}</div>
+        <div><strong>Billed To:</strong> {{ client_name | default('Client Name') }}</div>
+    </div>
+    <table>
+        <tr>
+            <th>Description</th>
+            <th style="width: 150px;">Total</th>
+        </tr>
+        <tr>
+            <td>{{ description | default('Service description here...') | replace('\n', '<br>') | safe }}</td>
+            <td>${{ amount | default('0.00') }}</td>
+        </tr>
+    </table>
+    <div class="amount-total">Total Due: ${{ amount | default('0.00') }}</div>
+</body>
+</html>
