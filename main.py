@@ -91,14 +91,52 @@ async def export_docx(payload: PreviewRequest):
         
         doc.add_heading("Key Metrics", level=1)
         doc.add_paragraph(data.get("metrics", ""))
+
+    elif payload.template == "cv":
+        doc.add_heading(data.get("name", "Full Name"), 0)
+        doc.add_paragraph(data.get("title", ""))
+        doc.add_paragraph(f"{data.get('email', '')} | {data.get('location', '')}")
         
+        doc.add_heading("Summary", level=1)
+        doc.add_paragraph(data.get("summary", ""))
+        
+        doc.add_heading("Skills", level=1)
+        try:
+            skills = json.loads(data.get("skills", "[]"))
+            for skill in skills:
+                doc.add_paragraph(f"{skill.get('category', '')}: {skill.get('items', '')}")
+        except:
+            doc.add_paragraph(data.get("skills", ""))
+        
+        doc.add_heading("Experience", level=1)
+        try:
+            experience = json.loads(data.get("experience", "[]"))
+            for job in experience:
+                doc.add_heading(f"{job.get('role', '')} — {job.get('company', '')}", level=2)
+                doc.add_paragraph(f"{job.get('dates', '')} | {job.get('location', '')}")
+                for bullet in job.get("bullets", []):
+                    doc.add_paragraph(bullet, style="List Bullet")
+        except:
+            doc.add_paragraph(data.get("experience", ""))
+
+        doc.add_heading("Education", level=1)
+        try:
+            education = json.loads(data.get("education", "[]"))
+            for edu in education:
+                doc.add_paragraph(f"{edu.get('title', '')} | {edu.get('institution', '')} — {edu.get('date', '')}")
+        except:
+            doc.add_paragraph(data.get("education", ""))
+
+        doc.add_heading("Languages", level=1)
+        doc.add_paragraph(data.get("languages", ""))
+    
     else:
         # Fallback dump for dynamic fields
         doc.add_heading(TEMPLATES.get(payload.template, {}).get("name", "Document"), 0)
         for key, val in data.items():
             doc.add_heading(key.replace("_", " ").title(), level=2)
             doc.add_paragraph(str(val))
-            
+
     doc_io = io.BytesIO()
     doc.save(doc_io)
     doc_io.seek(0)

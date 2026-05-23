@@ -1,4 +1,14 @@
+function toggleLang() {
+        currentLang = currentLang === "en" ? "es" : "en";
+        localStorage.setItem("lang", currentLang);
+        document.getElementById("lang-toggle").textContent = currentLang === "en" ? "ES" : "EN";
+        applyTranslations();
+}
+
 document.addEventListener("DOMContentLoaded", () => {
+     applyTranslations();
+     applyTheme();
+
     const templateSelect = document.getElementById("template-select");
     const dynamicForm = document.getElementById("dynamic-form");
     const previewFrame = document.getElementById("preview-frame");

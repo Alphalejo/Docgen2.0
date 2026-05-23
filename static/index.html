@@ -9,17 +9,23 @@
 <body>
     <div class="container">
         <div class="left-panel">
-            <h2>Live Preview</h2>
+            <h2 data-i18n="live_preview">Live Preview</h2>
             <iframe id="preview-frame"></iframe>
         </div>
         
         <div class="right-panel">
             <div class="right-header">
-                <h2>Document Builder</h2>
-                <div class="controls-top">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <h2 data-i18n="doc_builder">Document Builder</h2>
+                        <div style="display: flex; gap: 8px;">
+                            <button class="btn-outline" onclick="toggleTheme()" id="theme-toggle">🌙</button>
+                            <button class="btn-outline" onclick="toggleLang()" id="lang-toggle">ES</button>
+                        </div>
+                    </div>
+                    <div class="controls-top">
                     <select id="template-select" style="flex: 2;"></select>
                     <div class="file-upload-wrapper">
-                        <button class="btn-outline">Load JSON</button>
+                        <button class="btn-outline" data-i18n="load_json">Load JSON</button>
                         <input type="file" id="json-upload" accept=".json">
                     </div>
                 </div>
@@ -30,14 +36,15 @@
             </div>
 
             <div class="actions-bottom">
-                <button class="btn-primary" id="btn-preview">Force Preview Refresh</button>
+                <button class="btn-primary" id="btn-preview" data-i18n="force_preview">Force Preview Refresh</button>
                 <div class="btn-row">
-                    <button class="btn-success" id="btn-pdf">Download PDF</button>
-                    <button class="btn-success" id="btn-docx">Download DOCX</button>
+                    <button data-i18n="download_pdf">Download PDF</button>
+                    <button data-i18n="download_docx" class="btn-success" id="btn-docx">Download DOCX</button>
                 </div>
             </div>
         </div>
     </div>
+    <script src="/static/i18n.js"></script>
     <script src="/static/main.js"></script>
 </body>
 </html>

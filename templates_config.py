@@ -1,4 +1,21 @@
 TEMPLATES = {
+    "cv": {
+        "name": "Curriculum Vitae",
+        "fields": [
+            {"name": "name", "label": "Full Name", "type": "text"},
+            {"name": "title", "label": "Professional Title", "type": "text"},
+            {"name": "email", "label": "Email", "type": "text"},
+            {"name": "location", "label": "Location", "type": "text"},
+            {"name": "linkedin", "label": "LinkedIn URL", "type": "text"},
+            {"name": "github", "label": "GitHub URL", "type": "text"},
+            {"name": "portfolio", "label": "Portfolio URL", "type": "text"},
+            {"name": "summary", "label": "Professional Summary", "type": "textarea"},
+            {"name": "skills", "label": "Skills (JSON array)", "type": "textarea"},
+            {"name": "experience", "label": "Experience (JSON array)", "type": "textarea"},
+            {"name": "education", "label": "Education (JSON array)", "type": "textarea"},
+            {"name": "languages", "label": "Languages", "type": "textarea"}
+        ]
+    },
     "invoice": {
         "name": "Invoice",
         "fields": [

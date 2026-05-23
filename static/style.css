@@ -1,25 +1,47 @@
+:root {
+    --bg: #f0f2f5;
+    --panel-bg: #ffffff;
+    --border: #dddddd;
+    --text: #333333;
+    --subtext: #555555;
+    --header-bg: #fafafa;
+    --input-bg: #ffffff;
+    --shadow: rgba(0,0,0,0.1);
+}
+
+[data-theme="dark"] {
+    --bg: #1a1a2e;
+    --panel-bg: #16213e;
+    --border: #444444;
+    --text: #e0e0e0;
+    --subtext: #aaaaaa;
+    --header-bg: #0f3460;
+    --input-bg: #1a1a2e;
+    --shadow: rgba(0,0,0,0.4);
+}
+
 * { box-sizing: border-box; }
-body, html { margin: 0; padding: 0; height: 100%; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: #f0f2f5; }
+body, html { margin: 0; padding: 0; height: 100%; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: var(--bg); }
 .container { display: flex; height: 100vh; overflow: hidden; }
 
 /* Left Panel: Preview */
 .left-panel { flex: 1; padding: 20px; display: flex; flex-direction: column; }
-.left-panel h2 { margin-top: 0; margin-bottom: 15px; color: #333; }
-#preview-frame { flex: 1; width: 100%; border: none; background: #fff; box-shadow: 0 4px 12px rgba(0,0,0,0.1); border-radius: 8px; }
+.left-panel h2 { margin-top: 0; margin-bottom: 15px; color: var(--text); }
+#preview-frame { flex: 1; width: 100%; border: none; background: var(--panel-bg); box-shadow: 0 4px 12px var(--shadow); border-radius: 8px; }
 
 /* Right Panel: Builder Form */
-.right-panel { width: 450px; background-color: #fff; border-left: 1px solid #ddd; display: flex; flex-direction: column; }
-.right-header { padding: 20px; border-bottom: 1px solid #eee; background: #fafafa; }
-.right-header h2 { margin: 0; font-size: 1.2rem; color: #333; }
+.right-panel { width: 450px; background-color: var(--panel-bg); border-left: 1px solid var(--border); display: flex; flex-direction: column; }
+.right-header { padding: 20px; border-bottom: 1px solid var(--border); background: var(--header-bg); }
+.right-header h2 { margin: 0; font-size: 1.2rem; color: var(--text); }
 .scrollable-form { padding: 20px; overflow-y: auto; flex: 1; }
 .form-group { margin-bottom: 15px; }
-label { display: block; margin-bottom: 5px; font-weight: bold; font-size: 0.85rem; color: #555; text-transform: uppercase; }
-input[type="text"], input[type="number"], input[type="date"], select, textarea { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-family: inherit; font-size: 0.95rem; }
+label { display: block; margin-bottom: 5px; font-weight: bold; font-size: 0.85rem; color: var(--subtext); text-transform: uppercase; }
+input[type="text"], input[type="number"], input[type="date"], select, textarea { width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 4px; font-family: inherit; font-size: 0.95rem; background-color: var(--input-bg); color: var(--text); }
 textarea { resize: vertical; min-height: 100px; }
 
 /* Controls & Buttons */
 .controls-top { display: flex; gap: 10px; margin-top: 15px; }
-.actions-bottom { padding: 20px; border-top: 1px solid #eee; background: #fafafa; display: flex; flex-direction: column; gap: 10px; }
+.actions-bottom { padding: 20px; border-top: 1px solid var(--border); background: var(--header-bg); display: flex; flex-direction: column; gap: 10px; }
 .btn-row { display: flex; gap: 10px; }
 button { padding: 10px 15px; cursor: pointer; border: none; border-radius: 4px; font-weight: 600; font-size: 0.9rem; transition: background 0.2s; width: 100%; text-align: center; }
 
@@ -27,8 +49,8 @@ button { padding: 10px 15px; cursor: pointer; border: none; border-radius: 4px; 
 .btn-primary:hover { background: #0056b3; }
 .btn-success { background: #28a745; color: white; }
 .btn-success:hover { background: #218838; }
-.btn-outline { background: white; color: #333; border: 1px solid #ccc; }
-.btn-outline:hover { background: #eee; }
+.btn-outline { background: var(--panel-bg); color: var(--text); border: 1px solid var(--border); }
+.btn-outline:hover { background: var(--header-bg); }
 
 .file-upload-wrapper { position: relative; overflow: hidden; display: inline-block; flex: 1; }
 .file-upload-wrapper input[type=file] { font-size: 100px; position: absolute; left: 0; top: 0; opacity: 0; cursor: pointer; height: 100%; width: 100%; }

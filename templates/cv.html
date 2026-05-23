@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>{{ name | default('Resume') }} - {{ title | default('Curriculum Vitae') }}</title>
+<style>
+    @page {
+        size: letter;
+        margin: 20mm 15mm 20mm 15mm;
+        
+    }
+    body {
+        font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+        color: #333333;
+        line-height: 1.4;
+        font-size: 11pt;
+        margin: 0;
+        padding: 0;
+    }
+    @media screen {
+    body {
+        padding: 20mm 15mm 20mm 15mm;
+        }
+    }
+    a {
+        color: #1a5f7a;
+        text-decoration: none;
+    }
+    /* Header Styles */
+    .header {
+        border-bottom: 2px solid #1a5f7a;
+        padding-bottom: 12px;
+        margin-bottom: 18px;
+    }
+    .header h1 {
+        font-size: 26pt;
+        margin: 0 0 4px 0;
+        color: #1a5f7a;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+    .header h2 {
+        font-size: 14pt;
+        margin: 0 0 8px 0;
+        color: #555555;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+    }
+    .contact-info {
+        font-size: 9.5pt;
+        color: #666666;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+    .contact-info span:not(:last-child)::after {
+        content: " | ";
+        margin-left: 10px;
+        color: #ccc;
+    }
+
+    /* Section Styles */
+    .section {
+        margin-bottom: 18px;
+        page-break-inside: avoid;
+    }
+    .section-title {
+        font-size: 12pt;
+        font-weight: bold;
+        color: #1a5f7a;
+        text-transform: uppercase;
+        border-bottom: 1px solid #dddddd;
+        padding-bottom: 3px;
+        margin-bottom: 10px;
+        letter-spacing: 0.5px;
+    }
+    .summary-text {
+        text-align: justify;
+        margin-bottom: 0;
+    }
+
+    /* Experience Styles */
+    .job-entry {
+        margin-bottom: 14px;
+    }
+    .job-header {
+        display: flex;
+        justify-content: space-between;
+        font-weight: bold;
+        font-size: 11pt;
+        margin-bottom: 2px;
+    }
+    .job-company {
+        color: #1a5f7a;
+    }
+    .job-sub-header {
+        display: flex;
+        justify-content: space-between;
+        font-style: italic;
+        color: #555555;
+        font-size: 10pt;
+        margin-bottom: 6px;
+    }
+    .project-entry {
+        margin-top: 8px;
+        margin-left: 10px;
+    }
+    .project-title {
+        font-weight: bold;
+        font-size: 10.5pt;
+        color: #34495e;
+        margin-bottom: 4px;
+    }
+    ul {
+        margin: 0 0 6px 0;
+        padding-left: 20px;
+    }
+    li {
+        margin-bottom: 4px;
+        text-align: justify;
+    }
+
+    /* Grid Layouts for Skills & Education */
+    .skills-grid {
+        display: table;
+        width: 100%;
+        margin-top: 5px;
+    }
+    .skills-row {
+        display: table-row;
+    }
+    .skills-category {
+        display: table-cell;
+        font-weight: bold;
+        width: 25%;
+        padding-bottom: 6px;
+        color: #444444;
+        font-size: 10pt;
+    }
+    .skills-items {
+        display: table-cell;
+        padding-bottom: 6px;
+        font-size: 10pt;
+    }
+    
+    .education-container {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+    .edu-item {
+        display: flex;
+        justify-content: space-between;
+    }
+    .edu-detail {
+        font-weight: bold;
+    }
+    .edu-institution {
+        font-weight: normal;
+        color: #555555;
+    }
+</style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>{{ name | default('Alejandro Tovar Lamilla') }}</h1>
+        <h2>{{ title | default('Data Analyst / QA Engineer') }}</h2>
+        <div class="contact-info">
+            <span>{{ email | default('tovarl.alejandro@gmail.com') }}</span>
+            <span>{{ location | default('Bogotá, Colombia') }}</span>
+            {% if linkedin %}<span><a href="{{ linkedin }}">LinkedIn</a></span>{% endif %}
+            {% if github %}<span><a href="{{ github }}">GitHub</a></span>{% endif %}
+            {% if portfolio %}<span><a href="{{ portfolio }}">Portfolio</a></span>{% endif %}
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="section-title">Summary</div>
+        <p class="summary-text">
+            {{ summary | default('Data Analyst with 3+ years of experience in data quality assurance, pipeline validation, and analytical reporting across international client projects.') }}
+        </p>
+    </div>
+
+    <div class="section">
+        <div class="section-title">Skills</div>
+        <div class="skills-grid">
+            {% for skill in skills | default([
+                {"category": "SQL", "items": "Advanced - Complex queries, performance optimization, schema validation, PostgreSQL, MySQL, AWS RDS"},
+                {"category": "Data Quality & Testing", "items": "ETL Testing, Data Pipeline Validation, Schema Validation, Anomaly Detection, Data Profiling, Defect Lifecycle Management"},
+                {"category": "Python", "items": "Advanced - Pandas, NumPy, Scikit-learn, automated validation scripts, BeautifulSoup4, Plotly, Requests"},
+                {"category": "BI & Reporting", "items": "Power BI (Advanced DAX), Tableau, Looker Studio, Streamlit, Plotly"},
+                {"category": "Cloud & Infrastructure", "items": "Microsoft Azure, AWS Lambda, AWS RDS, Docker, ETL/ELT Pipelines, Data Warehousing"},
+                {"category": "AI & ML", "items": "Generative AI QA, ML Pipeline Testing, Model Output Validation, Google Gemini API, Scikit-learn"},
+                {"category": "Methodologies & Soft Skills", "items": "Agile Scrum (Certified), Data Quality Auditing, Technical Documentation, Stakeholder Communication, Mentoring"}
+            ]) %}
+            <div class="skills-row">
+                <div class="skills-category">{{ skill.category }}</div>
+                <div class="skills-items">{{ skill.items }}</div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="section-title">Professional Experience</div>
+        
+        {% for job in experience | default([
+            {
+                "role": "Data Analyst & QA Specialist",
+                "company": "Independent Consultant (3 active clients)",
+                "dates": "01/2023 - Present",
+                "location": "Remote - International",
+                "is_consultant": true,
+                "projects": [
+                    {
+                        "title": "Alfadog - Data Pipeline Validation & Quality Assurance (Australia)",
+                        "bullets": [
+                            "Designed and implemented data integrity checks and validation rules across an Azure/PostgreSQL ETL pipeline, including null checks, referential integrity constraints, and automated anomaly detection scripts in Python.",
+                            "Built a real-time operational reporting system tracking workforce metrics (hours worked, availability, cost per hour, total cost per trainer), ensuring data accuracy and pipeline reliability on a live basis.",
+                            "Defined and documented data validation standards and transformation logic to ensure pipeline auditability and reproducibility across the full data lifecycle."
+                        ]
+                    },
+                    {
+                        "title": "Huila Ruta 45 - Data Quality & BI Reporting (Colombia)",
+                        "bullets": [
+                            "Performed data profiling, schema validation, and quality auditing on raw operational datasets before dashboard delivery and resolved data integrity issues across source systems.",
+                            "Built executive dashboards in Power BI (Advanced DAX) and Tableau after validating data quality end-to-end, achieving an 8% increase in recurring customers and +2 CSAT points through clean, reliable analytics."
+                        ]
+                    },
+                    {
+                        "title": "Revelo - AI Model Output QA & Code Validation",
+                        "bullets": [
+                            "Validated and tested outputs of Generative AI models (Python/SQL), designed test cases to evaluate correctness and edge-case coverage, and produced clear technical documentation of findings.",
+                            "Developed functional and efficient code solutions to resolve identified issues, applying structured QA methodology to ensure model reliability and compliance."
+                        ]
+                    },
+                    {
+                        "title": "Sales Team Automated Reporting & Data Validation (Freelance Project)",
+                        "bullets": [
+                            "Built a validated Star Schema data model in Power BI with Advanced DAX measures for dynamic agent rankings, YTD revenue tracking, and anomaly detection in sales trends."
+                        ]
+                    }
+                ]
+            },
+            {
+                "role": "Design Project Associate (DPA) / QA Analyst",
+                "company": "Luxury Presence",
+                "dates": "11/2021 - Present",
+                "location": "Remote - USA",
+                "is_consultant": false,
+                "bullets": [
+                    "Led technical and design quality analysis on web builder deliverables across 50+ concurrent projects—evaluating front-end data structure integrity, schema compliance, CSS correctness, and adherence to client specifications.",
+                    "Defined and maintained QA standards, SOPs, and test coverage strategies for a distributed team, identifying recurring defect patterns through structured data logs to coordinate systematic fixes.",
+                    "Mentored and provided ongoing technical support to team members, improving team-wide quality output and reducing defect rates in final deployments.",
+                    "Promoted twice based on performance; coordinated cross-functional QA activities using Agile Scrum and Kanban frameworks while managing delivery KPIs and triaging issues based on business impact."
+                ]
+            }
+        ]) %}
+        
+        <div class="job-entry">
+            <div class="job-header">
+                <span class="job-role">{{ job.role }}</span>
+                <span class="job-dates">{{ job.dates }}</span>
+            </div>
+            <div class="job-sub-header">
+                <span class="job-company">{{ job.company }}</span>
+                <span class="job-location">{{ job.location }}</span>
+            </div>
+            
+            {% if job.is_consultant %}
+                {% for project in job.projects %}
+                    <div class="project-entry">
+                        <div class="project-title">{{ project.title }}</div>
+                        <ul>
+                            {% for bullet in project.bullets %}
+                                <li>{{ bullet }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <ul>
+                    {% for bullet in job.bullets %}
+                        <li>{{ bullet }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="section">
+        <div class="section-title">Education & Certifications</div>
+        <div class="education-container">
+            {% for edu in education | default([
+                {"title": "Data Science - DS4A", "institution": "Correlation One (Honors Graduate)", "date": "2021"},
+                {"title": "B.S. Mechatronics Engineering", "institution": "ECCI University Bogotá", "date": "2020"},
+                {"title": "Scrum Framework & Agile Practices", "institution": "Platzi / Scrum Fundamentals Certificate", "date": "2023"},
+                {"title": "Advanced SQL, Power BI, & DAX", "institution": "Platzi Data Analysis Path", "date": "2022"},
+                {"title": "Python, Statistics, & Machine Learning", "institution": "Platzi Data Science & AI Path", "date": "In Progress"}
+            ]) %}
+            <div class="edu-item">
+                <span class="edu-detail">{{ edu.title }} <span class="edu-institution">| {{ edu.institution }}</span></span>
+                <span class="edu-date">{{ edu.date }}</span>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="section-title">Languages</div>
+        <p style="margin: 5px 0 0 0; font-size: 10pt;">
+            {{ languages | default('<strong>Spanish:</strong> Native | <strong>English:</strong> Advanced (B2/C1) - Daily written and spoken communication with US-based teams and stakeholders.') }}
+        </p>
+    </div>
+
+</body>
+</html>
