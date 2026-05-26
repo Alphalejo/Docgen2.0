@@ -177,23 +177,10 @@
 
     <div class="section">
     <!-- SUMMARY -->
-    <div class="section-title">{{ "Resumen" if doc_lang == "es" else "Summary" }}</div>
+    <!--<div class="section-title">{{ "Resumen" if doc_lang == "es" else "Summary" }}</div> -->
         <p class="summary-text">
             {{ summary | default('') }}
         </p>
-    </div>
-
-    <!-- SKILLS -->
-    <div class="section">
-    <div class="section-title">{{ "Habilidades" if doc_lang == "es" else "Skills" }}</div>
-        <div class="skills-grid">
-            {% for skill in skills | default([]) %}
-            <div class="skills-row">
-                <div class="skills-category"><strong>{{ skill.category }}</strong></div>
-                <div class="skills-items">{{ skill['items'] }}</div>
-            </div>
-            {% endfor %}
-        </div>
     </div>
 
     <!-- EXPERIENCE -->
@@ -213,6 +200,46 @@
         </div>
         {% endfor %}
     </div>
+
+    <!-- SKILLS -->
+    <div class="section">
+    <div class="section-title">{{ "Habilidades" if doc_lang == "es" else "Skills" }}</div>
+        <div class="skills-grid">
+            {% for skill in skills | default([]) %}
+            <div class="skills-row">
+                <div class="skills-category"><strong>{{ skill.category }}</strong></div>
+                <div class="skills-items">{{ skill['items'] }}</div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- PROJECTS -->
+    {% if projects %}
+    <div class="section">
+        <div class="section-title">{{ "Proyectos Destacados" if doc_lang == "es" else "Featured Projects" }}</div>
+        {% for proj in projects %}
+        <div class="job-entry">
+            <div class="job-header">
+                <span class="job-role">
+                    {% if proj.link %}
+                        <a href="{{ proj.link }}">{{ proj.name }}</a>
+                    {% else %}
+                        {{ proj.name }}
+                    {% endif %}
+                </span>
+                <span class="job-dates">{{ proj.date }}</span>
+            </div>
+            {% if proj.tech %}
+            <div class="job-sub-header">
+                <span style="font-style:normal;"><strong>{{ "Tecnologías" if doc_lang == "es" else "Tech Stack" }}:</strong> {{ proj.tech }}</span>
+            </div>
+            {% endif %}
+            <p style="margin:4px 0 0 0; text-align:justify;">{{ proj.content | replace('\n', '<br>') | safe }}</p>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
 
     <!-- EDUCATION -->
     <div class="section">

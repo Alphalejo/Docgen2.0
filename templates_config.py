@@ -10,6 +10,7 @@ TEMPLATES = {
             {"name": "summary", "label": "Summary", "type": "textarea"},
             {"name": "skills", "label": "Skills", "type": "skills"},
             {"name": "experience", "label": "Experience", "type": "experience"},
+            {"name": "projects", "label": "Featured Projects", "type": "projects"},
             {"name": "education", "label": "Education", "type": "education"},
             {"name": "languages", "label": "Languages", "type": "languages"},
         ]

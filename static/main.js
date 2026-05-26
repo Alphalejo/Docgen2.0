@@ -52,6 +52,22 @@ function getPayload() {
             data.experience = JSON.stringify(experience);
         }
 
+        // Projects
+        const projContainer = document.getElementById("projects-container");
+        if (projContainer) {
+            const projects = [];
+            projContainer.querySelectorAll(".proj-entry").forEach(entry => {
+                projects.push({
+                    name: entry.querySelector(".proj-name")?.value.trim(),
+                    date: entry.querySelector(".proj-date")?.value.trim(),
+                    tech: entry.querySelector(".proj-tech")?.value.trim(),
+                    link: entry.querySelector(".proj-link")?.value.trim(),
+                    content: entry.querySelector(".proj-content")?.value.trim(),
+                });
+            });
+            data.projects = JSON.stringify(projects);
+        }
+
         // Education
         const eduContainer = document.getElementById("education-container");
         if (eduContainer) {
@@ -108,6 +124,67 @@ function toggleLang() {
         localStorage.setItem("lang", currentLang);
         document.getElementById("lang-toggle").textContent = currentLang === "en" ? "ES" : "EN";
         applyTranslations();
+}
+
+function addProjectRow(container) {
+    const entry = document.createElement("div");
+    entry.className = "proj-entry";
+    entry.style.cssText = "border:1px solid var(--border); border-radius:4px; padding:10px; margin-bottom:10px; display:flex; flex-direction:column; gap:8px;";
+
+    // Row 1: name, date
+    const row1 = document.createElement("div");
+    row1.style.cssText = "display:flex; gap:8px;";
+
+    const nameInput = document.createElement("input");
+    nameInput.type = "text";
+    nameInput.placeholder = "Project Name";
+    nameInput.className = "proj-name";
+    nameInput.style.flex = "2";
+    nameInput.addEventListener("input", triggerPreview);
+
+    const dateInput = document.createElement("input");
+    dateInput.type = "text";
+    dateInput.placeholder = "MM/YYYY";
+    dateInput.className = "proj-date";
+    dateInput.style.flex = "1";
+    dateInput.addEventListener("input", triggerPreview);
+
+    row1.appendChild(nameInput);
+    row1.appendChild(dateInput);
+
+    // Row 2: tech stack, link
+    const row2 = document.createElement("div");
+    row2.style.cssText = "display:flex; gap:8px;";
+
+    const techInput = document.createElement("input");
+    techInput.type = "text";
+    techInput.placeholder = "Tech Stack (e.g. Python, FastAPI, Docker)";
+    techInput.className = "proj-tech";
+    techInput.style.flex = "2";
+    techInput.addEventListener("input", triggerPreview);
+
+    const linkInput = document.createElement("input");
+    linkInput.type = "text";
+    linkInput.placeholder = "URL (optional)";
+    linkInput.className = "proj-link";
+    linkInput.style.flex = "1";
+    linkInput.addEventListener("input", triggerPreview);
+
+    row2.appendChild(techInput);
+    row2.appendChild(linkInput);
+
+    // Row 3: description
+    const descTextarea = document.createElement("textarea");
+    descTextarea.placeholder = "Describe the project, your role and impact...";
+    descTextarea.className = "proj-content";
+    descTextarea.style.cssText = "width:100%; min-height:80px; resize:vertical;";
+    descTextarea.addEventListener("input", triggerPreview);
+
+    entry.appendChild(row1);
+    entry.appendChild(row2);
+    entry.appendChild(descTextarea);
+    entry.appendChild(makeRemoveBtn(entry));
+    container.appendChild(entry);
 }
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -264,6 +341,18 @@ document.addEventListener("DOMContentLoaded", () => {
                 const headerRow = makeHeaderRow(field.label, () => addLanguageRow(container));
                 const container = document.createElement("div");
                 container.id = "languages-container";
+                group.appendChild(headerRow);
+                group.appendChild(container);
+                dynamicForm.appendChild(group);
+                return;
+            }
+
+            if (field.type === "projects") {
+                const group = document.createElement("div");
+                group.className = "form-group";
+                const headerRow = makeHeaderRow(field.label, () => addProjectRow(container));
+                const container = document.createElement("div");
+                container.id = "projects-container";
                 group.appendChild(headerRow);
                 group.appendChild(container);
                 dynamicForm.appendChild(group);
@@ -565,14 +654,106 @@ document.addEventListener("DOMContentLoaded", () => {
             return res.json();
         })
         .then(data => {
+            // Simple fields
             for (const [key, value] of Object.entries(data)) {
                 const input = dynamicForm.querySelector(`[name="${key}"]`);
                 if (input) input.value = value;
             }
+
+            // Links
+            if (data.links) {
+                const container = document.getElementById("links-container");
+                if (container) {
+                    container.innerHTML = "";
+                    data.links.forEach(link => {
+                        addLinkRow(container);
+                        const row = container.lastElementChild;
+                        row.querySelector(".link-name").value = link.name || "";
+                        row.querySelector(".link-url").value = link.url || "";
+                    });
+                }
+            }
+
+            // Skills
+            if (data.skills) {
+                const container = document.getElementById("skills-container");
+                if (container) {
+                    container.innerHTML = "";
+                    data.skills.forEach(skill => {
+                        addSkillRow(container);
+                        const row = container.lastElementChild;
+                        row.querySelector(".skill-category").value = skill.category || "";
+                        row.querySelector(".skill-items").value = skill.items || "";
+                    });
+                }
+            }
+
+            // Experience
+            if (data.experience) {
+                const container = document.getElementById("experience-container");
+                if (container) {
+                    container.innerHTML = "";
+                    data.experience.forEach(job => {
+                        addExperienceRow(container);
+                        const entry = container.lastElementChild;
+                        entry.querySelector(".exp-role").value = job.role || "";
+                        entry.querySelector(".exp-start").value = job.start_date || "";
+                        entry.querySelector(".exp-company").value = job.company || "";
+                        entry.querySelector(".exp-location").value = job.location || "";
+                        entry.querySelector(".exp-content").value = job.content || "";
+                        const currentCheck = entry.querySelector(".exp-current");
+                        const endInput = entry.querySelector(".exp-end");
+                        currentCheck.checked = job.current || false;
+                        if (job.current) {
+                            endInput.disabled = true;
+                            endInput.style.opacity = "0.4";
+                        } else {
+                            endInput.value = job.end_date || "";
+                        }
+                    });
+                }
+            }
+
+            // Education
+            if (data.education) {
+                const container = document.getElementById("education-container");
+                if (container) {
+                    container.innerHTML = "";
+                    data.education.forEach(edu => {
+                        addEducationRow(container);
+                        const entry = container.lastElementChild;
+                        entry.querySelector(".edu-title").value = edu.title || "";
+                        entry.querySelector(".edu-institution").value = edu.institution || "";
+                        entry.querySelector(".edu-description").value = edu.description || "";
+                        const progressCheck = entry.querySelector(".edu-progress");
+                        const dateInput = entry.querySelector(".edu-date");
+                        progressCheck.checked = edu.in_progress || false;
+                        if (edu.in_progress) {
+                            dateInput.disabled = true;
+                            dateInput.style.opacity = "0.4";
+                        } else {
+                            dateInput.value = edu.date || "";
+                        }
+                    });
+                }
+            }
+
+            // Languages
+            if (data.languages) {
+                const container = document.getElementById("languages-container");
+                if (container) {
+                    container.innerHTML = "";
+                    data.languages.forEach(lang => {
+                        addLanguageRow(container);
+                        container.lastElementChild.querySelector(".lang-input").value = lang;
+                    });
+                }
+            }
+
             updatePreview();
-            jsonUpload.value = ""; // Reset file input
+            jsonUpload.value = "";
         })
-        .catch(err => {
+        .catch(() => {
             alert("Error: Please upload a valid JSON object file.");
             jsonUpload.value = "";
         });

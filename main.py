@@ -66,7 +66,7 @@ async def export_pdf(payload: PreviewRequest):
     template = templates.get_template(f"{payload.template}.html")
     data = payload.data.copy()
     
-    json_fields = ["skills", "experience", "education", "links", "languages"]
+    json_fields = ["skills", "experience", "education", "links", "languages", "projects"]
     for field in json_fields:
         if field in data:
             if data[field].strip():
