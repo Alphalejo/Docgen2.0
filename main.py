@@ -24,6 +24,7 @@ templates = Jinja2Templates(directory="app/templates")
 class PreviewRequest(BaseModel):
     template: str
     data: dict
+    doc_lang: str = "en"
 
 @app.get("/", response_class=HTMLResponse)
 async def serve_ui():
@@ -43,13 +44,40 @@ async def preview_document(payload: PreviewRequest):
         return HTMLResponse("Invalid Template", status_code=400)
     
     template = templates.get_template(f"{payload.template}.html")
-    html_content = template.render(**payload.data)
+    data = payload.data.copy()
+    
+    json_fields = ["skills", "experience", "education", "links", "languages"]
+    for field in json_fields:
+        if field in data:
+            if data[field].strip():
+                try:
+                    data[field] = json.loads(data[field])
+                except:
+                    del data[field]
+            else:
+                del data[field]
+    
+    html_content = template.render(**data, doc_lang=payload.doc_lang)
     return html_content
 
 @app.post("/export/pdf")
 async def export_pdf(payload: PreviewRequest):
+    """Renders Jinja2 template and converts to PDF via WeasyPrint."""
     template = templates.get_template(f"{payload.template}.html")
-    html_content = template.render(**payload.data)
+    data = payload.data.copy()
+    
+    json_fields = ["skills", "experience", "education", "links", "languages"]
+    for field in json_fields:
+        if field in data:
+            if data[field].strip():
+                try:
+                    data[field] = json.loads(data[field])
+                except:
+                    del data[field]
+            else:
+                del data[field]
+    
+    html_content = template.render(**data, doc_lang=payload.doc_lang)
     pdf_bytes = HTML(string=html_content).write_pdf()
     
     return Response(
@@ -93,39 +121,47 @@ async def export_docx(payload: PreviewRequest):
         doc.add_paragraph(data.get("metrics", ""))
 
     elif payload.template == "cv":
+        data = payload.data.copy()
+        
+        # Parse JSON fields
+        json_fields = ["skills", "experience", "education", "links"]
+        for field in json_fields:
+            if field in data:
+                if data[field].strip():
+                    try:
+                        data[field] = json.loads(data[field])
+                    except:
+                        del data[field]
+                else:
+                    del data[field]
+        
         doc.add_heading(data.get("name", "Full Name"), 0)
         doc.add_paragraph(data.get("title", ""))
-        doc.add_paragraph(f"{data.get('email', '')} | {data.get('location', '')}")
+        
+        links_text = data.get("email", "")
+        if data.get("location"):
+            links_text += f" | {data.get('location', '')}"
+        for link in data.get("links", []):
+            links_text += f" | {link.get('name', '')}: {link.get('url', '')}"
+        doc.add_paragraph(links_text)
         
         doc.add_heading("Summary", level=1)
         doc.add_paragraph(data.get("summary", ""))
         
         doc.add_heading("Skills", level=1)
-        try:
-            skills = json.loads(data.get("skills", "[]"))
-            for skill in skills:
-                doc.add_paragraph(f"{skill.get('category', '')}: {skill.get('items', '')}")
-        except:
-            doc.add_paragraph(data.get("skills", ""))
+        for skill in data.get("skills", []):
+            doc.add_paragraph(f"{skill.get('category', '')}: {skill.get('items', '')}")
         
         doc.add_heading("Experience", level=1)
-        try:
-            experience = json.loads(data.get("experience", "[]"))
-            for job in experience:
-                doc.add_heading(f"{job.get('role', '')} — {job.get('company', '')}", level=2)
-                doc.add_paragraph(f"{job.get('dates', '')} | {job.get('location', '')}")
-                for bullet in job.get("bullets", []):
-                    doc.add_paragraph(bullet, style="List Bullet")
-        except:
-            doc.add_paragraph(data.get("experience", ""))
+        for job in data.get("experience", []):
+            doc.add_heading(f"{job.get('role', '')} — {job.get('company', '')}", level=2)
+            doc.add_paragraph(f"{job.get('dates', '')} | {job.get('location', '')}")
+            for bullet in job.get("bullets", []):
+                doc.add_paragraph(bullet, style="List Bullet")
 
         doc.add_heading("Education", level=1)
-        try:
-            education = json.loads(data.get("education", "[]"))
-            for edu in education:
-                doc.add_paragraph(f"{edu.get('title', '')} | {edu.get('institution', '')} — {edu.get('date', '')}")
-        except:
-            doc.add_paragraph(data.get("education", ""))
+        for edu in data.get("education", []):
+            doc.add_paragraph(f"{edu.get('title', '')} | {edu.get('institution', '')} — {edu.get('date', '')}")
 
         doc.add_heading("Languages", level=1)
         doc.add_paragraph(data.get("languages", ""))

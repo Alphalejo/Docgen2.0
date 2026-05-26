@@ -7,7 +7,8 @@ const TRANSLATIONS = {
         force_preview: "Force Preview Refresh",
         download_pdf: "Download PDF",
         download_docx: "Download DOCX",
-        toggle_theme: "🌙"
+        toggle_theme: "🌙",
+        settings: "Settings"
     },
     es: {
         live_preview: "Vista Previa",
@@ -16,7 +17,8 @@ const TRANSLATIONS = {
         force_preview: "Actualizar Vista Previa",
         download_pdf: "Descargar PDF",
         download_docx: "Descargar DOCX",
-        toggle_theme: "🌙"
+        toggle_theme: "🌙",
+        settings: "Configuración"
     }
 };
 
@@ -39,4 +41,8 @@ function toggleTheme() {
     currentTheme = currentTheme === "light" ? "dark" : "light";
     localStorage.setItem("theme", currentTheme);
     applyTheme();
+}
+
+function toggleMenu() {
+    document.getElementById("side-menu").classList.toggle("open");
 }
