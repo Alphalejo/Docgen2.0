@@ -98,18 +98,84 @@ function getPayload() {
 }
 
 function updatePreview() {
-        const payload = getPayload();
-        if (!payload.template) return;
+    const payload = getPayload();
+    if (!payload.template) return;
 
-        fetch("/preview", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(payload)
-        })
-        .then(res => res.text())
-        .then(html => {
-            previewFrame.srcdoc = html;
-        });
+    fetch("/preview", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+    })
+    .then(res => res.text())
+    .then(html => {
+    // Read background color from parent
+    const bgColor = getComputedStyle(document.documentElement)
+        .getPropertyValue("--bg").trim();
+
+    const pageBreakStyle = `
+    <style>
+        @media screen {
+            body {
+                counter-reset: page-counter;
+            }
+            .page-break-indicator {
+                width: calc(100% + 110px);
+                margin: 40px 0 40px -60px;
+                box-shadow: inset 0 8px 8px -8px rgba(0,0,0,0.1), inset 0 -8px 8px -8px rgba(0,0,0,0.1);
+                height: 30px;
+                background: ${bgColor};
+                position: relative;
+                display: flex;
+                align-items: baseline;
+                justify-content: flex-end;
+                padding-right: 12px;
+            }
+            .page-break-indicator::after {
+                content: "Page " counter(page-counter);
+                counter-increment: page-counter;
+                font-size: 9px;
+                color: #888;
+                font-family: sans-serif;
+            }
+        }
+    </style>
+    <script>
+        const PAGE_HEIGHT = 905;
+
+        function injectPageBreaks() {
+            document.querySelectorAll(".page-break-indicator").forEach(el => el.remove());
+
+            const body = document.body;
+            let currentHeight = 0;
+            let pageNum = 1;
+            const indicators = [];
+
+            // Walk through all elements and find where page breaks occur
+            const elements = Array.from(body.children);
+            for (const el of elements) {
+                const elBottom = el.offsetTop + el.offsetHeight;
+                if (elBottom > currentHeight + PAGE_HEIGHT) {
+                    indicators.push({ afterEl: el, page: pageNum });
+                    currentHeight = el.offsetTop;
+                    pageNum++;
+                }
+            }
+
+            indicators.forEach(({ afterEl }) => {
+                const indicator = document.createElement("div");
+                indicator.className = "page-break-indicator";
+                afterEl.parentNode.insertBefore(indicator, afterEl.nextSibling);
+            });
+        }
+
+        window.addEventListener("load", injectPageBreaks);
+    <\/script>`;
+
+    previewFrame.srcdoc = html.replace("</body>", pageBreakStyle + "</body>");
+    previewFrame.addEventListener("load", () => {
+    previewFrame.style.height = previewFrame.contentDocument.body.scrollHeight + "px";
+});
+});
 }
 
 function setDocLang(lang) {
@@ -117,74 +183,6 @@ function setDocLang(lang) {
     document.getElementById("doc-lang-en").classList.toggle("active", lang === "en");
     document.getElementById("doc-lang-es").classList.toggle("active", lang === "es");
     updatePreview();
-}
-
-function toggleLang() {
-        currentLang = currentLang === "en" ? "es" : "en";
-        localStorage.setItem("lang", currentLang);
-        document.getElementById("lang-toggle").textContent = currentLang === "en" ? "ES" : "EN";
-        applyTranslations();
-}
-
-function addProjectRow(container) {
-    const entry = document.createElement("div");
-    entry.className = "proj-entry";
-    entry.style.cssText = "border:1px solid var(--border); border-radius:4px; padding:10px; margin-bottom:10px; display:flex; flex-direction:column; gap:8px;";
-
-    // Row 1: name, date
-    const row1 = document.createElement("div");
-    row1.style.cssText = "display:flex; gap:8px;";
-
-    const nameInput = document.createElement("input");
-    nameInput.type = "text";
-    nameInput.placeholder = "Project Name";
-    nameInput.className = "proj-name";
-    nameInput.style.flex = "2";
-    nameInput.addEventListener("input", triggerPreview);
-
-    const dateInput = document.createElement("input");
-    dateInput.type = "text";
-    dateInput.placeholder = "MM/YYYY";
-    dateInput.className = "proj-date";
-    dateInput.style.flex = "1";
-    dateInput.addEventListener("input", triggerPreview);
-
-    row1.appendChild(nameInput);
-    row1.appendChild(dateInput);
-
-    // Row 2: tech stack, link
-    const row2 = document.createElement("div");
-    row2.style.cssText = "display:flex; gap:8px;";
-
-    const techInput = document.createElement("input");
-    techInput.type = "text";
-    techInput.placeholder = "Tech Stack (e.g. Python, FastAPI, Docker)";
-    techInput.className = "proj-tech";
-    techInput.style.flex = "2";
-    techInput.addEventListener("input", triggerPreview);
-
-    const linkInput = document.createElement("input");
-    linkInput.type = "text";
-    linkInput.placeholder = "URL (optional)";
-    linkInput.className = "proj-link";
-    linkInput.style.flex = "1";
-    linkInput.addEventListener("input", triggerPreview);
-
-    row2.appendChild(techInput);
-    row2.appendChild(linkInput);
-
-    // Row 3: description
-    const descTextarea = document.createElement("textarea");
-    descTextarea.placeholder = "Describe the project, your role and impact...";
-    descTextarea.className = "proj-content";
-    descTextarea.style.cssText = "width:100%; min-height:80px; resize:vertical;";
-    descTextarea.addEventListener("input", triggerPreview);
-
-    entry.appendChild(row1);
-    entry.appendChild(row2);
-    entry.appendChild(descTextarea);
-    entry.appendChild(makeRemoveBtn(entry));
-    container.appendChild(entry);
 }
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -195,6 +193,9 @@ document.addEventListener("DOMContentLoaded", () => {
     templateSelect = document.getElementById("template-select");
     dynamicForm = document.getElementById("dynamic-form");
     const jsonUpload = document.getElementById("json-upload");
+    document.getElementById("btn-load-json").addEventListener("click", () => {
+        document.getElementById("json-upload").click();
+    });
     
     let templatesConfig = {};
     let debounceTimer;
@@ -261,7 +262,7 @@ document.addEventListener("DOMContentLoaded", () => {
         container.appendChild(row);
     }
 
-    function renderForm() {
+    window.renderForm = function() {
         dynamicForm.innerHTML = "";
         const selectedKey = templateSelect.value;
         if (!selectedKey || !templatesConfig[selectedKey]) return;
@@ -277,7 +278,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 headerRow.style.cssText = "display:flex; align-items:center; justify-content:space-between; margin-bottom:8px;";
 
                 const label = document.createElement("label");
-                label.textContent = field.label;
+                label.textContent = currentLang === "es" && field.label_es ? field.label_es : field.label;
                 label.style.margin = "0";
 
                 const addBtn = document.createElement("button");
@@ -302,7 +303,8 @@ document.addEventListener("DOMContentLoaded", () => {
             if (field.type === "skills") {
                 const group = document.createElement("div");
                 group.className = "form-group";
-                const headerRow = makeHeaderRow(field.label, () => addSkillRow(container));
+                const labelText = currentLang === "es" && field.label_es ? field.label_es : field.label;
+                const headerRow = makeHeaderRow(labelText, () => addSkillRow(container));
                 const container = document.createElement("div");
                 container.id = "skills-container";
                 group.appendChild(headerRow);
@@ -314,7 +316,8 @@ document.addEventListener("DOMContentLoaded", () => {
             if (field.type === "experience") {
                 const group = document.createElement("div");
                 group.className = "form-group";
-                const headerRow = makeHeaderRow(field.label, () => addExperienceRow(container));
+                const labelText = currentLang === "es" && field.label_es ? field.label_es : field.label;
+                const headerRow = makeHeaderRow(labelText, () => addExperienceRow(container));
                 const container = document.createElement("div");
                 container.id = "experience-container";
                 group.appendChild(headerRow);
@@ -326,7 +329,8 @@ document.addEventListener("DOMContentLoaded", () => {
             if (field.type === "education") {
                 const group = document.createElement("div");
                 group.className = "form-group";
-                const headerRow = makeHeaderRow(field.label, () => addEducationRow(container));
+                const labelText = currentLang === "es" && field.label_es ? field.label_es : field.label;
+                const headerRow = makeHeaderRow(labelText, () => addEducationRow(container));
                 const container = document.createElement("div");
                 container.id = "education-container";
                 group.appendChild(headerRow);
@@ -338,7 +342,8 @@ document.addEventListener("DOMContentLoaded", () => {
             if (field.type === "languages") {
                 const group = document.createElement("div");
                 group.className = "form-group";
-                const headerRow = makeHeaderRow(field.label, () => addLanguageRow(container));
+                const labelText = currentLang === "es" && field.label_es ? field.label_es : field.label;
+                const headerRow = makeHeaderRow(labelText, () => addLanguageRow(container));
                 const container = document.createElement("div");
                 container.id = "languages-container";
                 group.appendChild(headerRow);
@@ -350,7 +355,8 @@ document.addEventListener("DOMContentLoaded", () => {
             if (field.type === "projects") {
                 const group = document.createElement("div");
                 group.className = "form-group";
-                const headerRow = makeHeaderRow(field.label, () => addProjectRow(container));
+                const labelText = currentLang === "es" && field.label_es ? field.label_es : field.label;
+                const headerRow = makeHeaderRow(labelText, () => addProjectRow(container));
                 const container = document.createElement("div");
                 container.id = "projects-container";
                 group.appendChild(headerRow);
@@ -363,7 +369,7 @@ document.addEventListener("DOMContentLoaded", () => {
             group.className = "form-group";
             
             const label = document.createElement("label");
-            label.textContent = field.label;
+            label.textContent = currentLang === "es" && field.label_es ? field.label_es : field.label;
             label.htmlFor = field.name;
             
             let input = document.createElement(field.type === "textarea" ? "textarea" : "input");
@@ -524,6 +530,67 @@ document.addEventListener("DOMContentLoaded", () => {
         entry.appendChild(row2);
         entry.appendChild(contentTextarea);
         entry.appendChild(removeBtn);
+        container.appendChild(entry);
+    }
+
+    function addProjectRow(container) {
+        const entry = document.createElement("div");
+        entry.className = "proj-entry";
+        entry.style.cssText = "border:1px solid var(--border); border-radius:4px; padding:10px; margin-bottom:10px; display:flex; flex-direction:column; gap:8px;";
+
+        // Row 1: name, date
+        const row1 = document.createElement("div");
+        row1.style.cssText = "display:flex; gap:8px;";
+
+        const nameInput = document.createElement("input");
+        nameInput.type = "text";
+        nameInput.placeholder = "Project Name";
+        nameInput.className = "proj-name";
+        nameInput.style.flex = "2";
+        nameInput.addEventListener("input", triggerPreview);
+
+        const dateInput = document.createElement("input");
+        dateInput.type = "text";
+        dateInput.placeholder = "MM/YYYY";
+        dateInput.className = "proj-date";
+        dateInput.style.flex = "1";
+        dateInput.addEventListener("input", triggerPreview);
+
+        row1.appendChild(nameInput);
+        row1.appendChild(dateInput);
+
+        // Row 2: tech stack, link
+        const row2 = document.createElement("div");
+        row2.style.cssText = "display:flex; gap:8px;";
+
+        const techInput = document.createElement("input");
+        techInput.type = "text";
+        techInput.placeholder = "Tech Stack (e.g. Python, FastAPI, Docker)";
+        techInput.className = "proj-tech";
+        techInput.style.flex = "2";
+        techInput.addEventListener("input", triggerPreview);
+
+        const linkInput = document.createElement("input");
+        linkInput.type = "text";
+        linkInput.placeholder = "URL (optional)";
+        linkInput.className = "proj-link";
+        linkInput.style.flex = "1";
+        linkInput.addEventListener("input", triggerPreview);
+
+        row2.appendChild(techInput);
+        row2.appendChild(linkInput);
+
+        // Row 3: description
+        const descTextarea = document.createElement("textarea");
+        descTextarea.placeholder = "Describe the project, your role and impact...";
+        descTextarea.className = "proj-content";
+        descTextarea.style.cssText = "width:100%; min-height:80px; resize:vertical;";
+        descTextarea.addEventListener("input", triggerPreview);
+
+        entry.appendChild(row1);
+        entry.appendChild(row2);
+        entry.appendChild(descTextarea);
+        entry.appendChild(makeRemoveBtn(entry));
         container.appendChild(entry);
     }
 
@@ -710,6 +777,23 @@ document.addEventListener("DOMContentLoaded", () => {
                         } else {
                             endInput.value = job.end_date || "";
                         }
+                    });
+                }
+            }
+
+            // Projects
+            if (data.projects) {
+                const container = document.getElementById("projects-container");
+                if (container) {
+                    container.innerHTML = "";
+                    data.projects.forEach(proj => {
+                        addProjectRow(container);
+                        const entry = container.lastElementChild;
+                        entry.querySelector(".proj-name").value = proj.name || "";
+                        entry.querySelector(".proj-date").value = proj.date || "";
+                        entry.querySelector(".proj-tech").value = proj.tech || "";
+                        entry.querySelector(".proj-link").value = proj.link || "";
+                        entry.querySelector(".proj-content").value = proj.content || "";
                     });
                 }
             }

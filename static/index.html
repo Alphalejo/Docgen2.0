@@ -5,11 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document Builder</title>
     <link rel="stylesheet" href="/static/style.css">
+    <link rel="icon" type="image/png" href="/static/favicon.png">
 </head>
 <body>
     <!-- HEADER -->
     <header class="header">
         <div class="header-left">
+            <img id="logo-light" src="/static/logo-light.png" alt="Logo" style="height: 48px;">
+            <img id="logo-dark" src="/static/logo-dark.png" alt="Logo" style="height: 48px; display:none;">
             <span class="logo">DocBuilder</span>
         </div>
         <div class="header-right">
@@ -32,27 +35,23 @@
                     <button class="doc-lang-btn" id="doc-lang-es" onclick="setDocLang('es')">ES</button>
                 </div>
             </div>
-            <iframe id="preview-frame"></iframe>
+            <div class="viewer-body">
+                <iframe id="preview-frame" scrolling="no"></iframe>
+            </div>
         </div>
 
         <!-- EDITOR -->
         <div class="panel editor">
             <div class="panel-header" data-i18n="doc_builder">Document Builder</div>
             <div class="editor-content">
-                <div class="editor-top">
-                    <div class="file-upload-wrapper">
-                        <button class="btn-outline" data-i18n="load_json">Load JSON</button>
-                        <input type="file" id="json-upload" accept=".json">
-                    </div>
-                </div>
                 <div class="scrollable-form">
                     <form id="dynamic-form"></form>
                 </div>
                 <div class="actions-bottom">
-                    <button class="btn-primary" id="btn-preview" data-i18n="force_preview">Force Preview Refresh</button>
+                    <input type="file" id="json-upload" accept=".json" style="display:none;">
                     <div class="btn-row">
+                        <button class="btn-outline" id="btn-load-json" data-i18n="load_json">Load JSON</button>
                         <button class="btn-success" id="btn-pdf" data-i18n="download_pdf">Download PDF</button>
-                        <button class="btn-success" id="btn-docx" data-i18n="download_docx">Download DOCX</button>
                     </div>
                 </div>
             </div>
@@ -61,7 +60,12 @@
         <!-- SIDE MENU -->
         <div class="side-menu" id="side-menu">
             <div class="side-menu-header" data-i18n="settings">Settings</div>
-            <div class="side-menu-body"></div>
+            <div class="side-menu-body">
+                <div style="display:flex; flex-direction:column; gap:8px;">
+                    <button class="btn-primary" id="btn-preview" data-i18n="force_preview">Force Preview Refresh</button>
+                    <button class="btn-success" id="btn-docx" data-i18n="download_docx">Download DOCX</button>
+                </div>
+            </div>
         </div>
 
     </div>

@@ -46,7 +46,7 @@ async def preview_document(payload: PreviewRequest):
     template = templates.get_template(f"{payload.template}.html")
     data = payload.data.copy()
     
-    json_fields = ["skills", "experience", "education", "links", "languages"]
+    json_fields = ["skills", "experience", "education", "links", "languages", "projects"]
     for field in json_fields:
         if field in data:
             if data[field].strip():
@@ -124,7 +124,7 @@ async def export_docx(payload: PreviewRequest):
         data = payload.data.copy()
         
         # Parse JSON fields
-        json_fields = ["skills", "experience", "education", "links"]
+        json_fields = ["skills", "experience", "education", "links", "languages", "projects"]
         for field in json_fields:
             if field in data:
                 if data[field].strip():

@@ -35,14 +35,43 @@ function applyTranslations() {
 function applyTheme() {
     document.documentElement.setAttribute("data-theme", currentTheme);
     document.getElementById("theme-toggle").textContent = currentTheme === "light" ? "🌙" : "☀️";
+    
+    document.getElementById("logo-dark").style.display = currentTheme === "light" ? "block" : "none";
+    document.getElementById("logo-light").style.display = currentTheme === "dark" ? "block" : "none";
 }
 
 function toggleTheme() {
     currentTheme = currentTheme === "light" ? "dark" : "light";
     localStorage.setItem("theme", currentTheme);
     applyTheme();
+    updatePreview();
 }
 
 function toggleMenu() {
     document.getElementById("side-menu").classList.toggle("open");
+}
+
+function toggleLang() {
+    currentLang = currentLang === "en" ? "es" : "en";
+    localStorage.setItem("lang", currentLang);
+    document.getElementById("lang-toggle").textContent = currentLang === "en" ? "ES" : "EN";
+    applyTranslations();
+    
+    if (window.renderForm) {
+        // Save current values before re-render
+        const saved = {};
+        document.querySelectorAll("#dynamic-form input, #dynamic-form textarea, #dynamic-form select").forEach(el => {
+            if (el.name) saved[el.name] = el.value;
+        });
+        
+        window.renderForm();
+        
+        // Restore simple values after re-render
+        setTimeout(() => {
+            Object.entries(saved).forEach(([name, value]) => {
+                const el = document.querySelector(`[name="${name}"]`);
+                if (el) el.value = value;
+            });
+        }, 50);
+    }
 }
