@@ -365,6 +365,52 @@ document.addEventListener("DOMContentLoaded", () => {
                 return;
             }
 
+            if (field.type === "rich-textarea") {
+                const group = document.createElement("div");
+                group.className = "form-group";
+            
+                const label = document.createElement("label");
+                label.textContent = currentLang === "es" && field.label_es ? field.label_es : field.label;
+                label.htmlFor = field.name;
+            
+                const boldBtn = document.createElement("button");
+                boldBtn.type = "button";
+                boldBtn.textContent = "Bold";
+                boldBtn.title = "Bold (**text**)";
+                boldBtn.className = "btn-outline bold-btn";
+            
+                const headerRow = document.createElement("div");
+                headerRow.style.cssText = "display:flex; align-items:center; justify-content:space-between; margin-bottom:4px;";
+                headerRow.appendChild(label);
+                headerRow.appendChild(boldBtn);
+            
+                const input = document.createElement("textarea");
+                input.name = field.name;
+                input.id = field.name;
+                input.className = "rich";
+                input.addEventListener("input", () => {
+                    clearTimeout(debounceTimer);
+                    debounceTimer = setTimeout(updatePreview, 500);
+                });
+            
+                boldBtn.addEventListener("click", () => {
+                    const start = input.selectionStart;
+                    const end = input.selectionEnd;
+                    const selected = input.value.substring(start, end);
+                    if (!selected) return;
+                    const wrapped = `**${selected}**`;
+                    input.value = input.value.substring(0, start) + wrapped + input.value.substring(end);
+                    input.setSelectionRange(start, start + wrapped.length);
+                    clearTimeout(debounceTimer);
+                    debounceTimer = setTimeout(updatePreview, 500);
+                });
+            
+                group.appendChild(headerRow);
+                group.appendChild(input);
+                dynamicForm.appendChild(group);
+                return;
+            }
+
             const group = document.createElement("div");
             group.className = "form-group";
             

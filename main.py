@@ -2,6 +2,7 @@ import sys
 import os
 sys.path.insert(0, os.path.dirname(__file__))
 
+import re
 import io
 import json
 from fastapi import FastAPI, UploadFile, File
@@ -18,8 +19,17 @@ from templates_config import TEMPLATES
 app = FastAPI(title="Document Builder API")
 
 # Mount static files & configure Jinja2 templates
-app.mount("/static", StaticFiles(directory="app/static"), name="static")
-templates = Jinja2Templates(directory="app/templates")
+app.mount("/static", StaticFiles(directory="static"), name="static")
+templates = Jinja2Templates(directory="templates")
+
+templates.env.filters["regex_replace"] = lambda value, pattern, replacement: re.sub(pattern, replacement, value)
+def highlight_paragraph_titles(text: str) -> str:
+    # Wrap "Title:" patterns at the start of paragraphs with colored span
+    return re.sub(r'(?m)^([^<\n]+?):', r'<span style="color:#1a5f7a;font-weight:bold;">\1:</span>', text)
+
+def parse_bold(text: str) -> str:
+    # Convert **word** to <strong>word</strong>
+    return re.sub(r'\*\*(.+?)\*\*', r'<strong>\1</strong>', text)
 
 class PreviewRequest(BaseModel):
     template: str
@@ -29,7 +39,7 @@ class PreviewRequest(BaseModel):
 @app.get("/", response_class=HTMLResponse)
 async def serve_ui():
     """Serves the main vanilla HTML interface."""
-    with open("app/static/index.html", "r", encoding="utf-8") as f:
+    with open("static/index.html", "r", encoding="utf-8") as f:
         return f.read()
 
 @app.get("/templates")
@@ -57,6 +67,13 @@ async def preview_document(payload: PreviewRequest):
             else:
                 del data[field]
     
+    if "summary" in data:
+        data["summary"] = parse_bold(data["summary"])
+
+    for job in data.get("experience", []):
+        if "content" in job:
+            job["content"] = highlight_paragraph_titles(job["content"])
+            
     html_content = template.render(**data, doc_lang=payload.doc_lang)
     return html_content
 
@@ -76,7 +93,14 @@ async def export_pdf(payload: PreviewRequest):
                     del data[field]
             else:
                 del data[field]
+
+    if "summary" in data:
+        data["summary"] = parse_bold(data["summary"])
     
+    for job in data.get("experience", []):
+        if "content" in job:
+            job["content"] = highlight_paragraph_titles(job["content"])
+
     html_content = template.render(**data, doc_lang=payload.doc_lang)
     pdf_bytes = HTML(string=html_content).write_pdf()
     

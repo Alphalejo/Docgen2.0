@@ -7,7 +7,7 @@ TEMPLATES = {
             {"name": "email", "label": "Email", "label_es": "Correo Electrónico", "type": "text"},
             {"name": "location", "label": "Location", "label_es": "Ubicación", "type": "text"},
             {"name": "links", "label": "Links", "label_es": "Enlaces", "type": "links"},
-            {"name": "summary", "label": "Summary", "label_es": "Resumen", "type": "textarea"},
+            {"name": "summary", "label": "Summary", "label_es": "Resumen", "type": "rich-textarea"},
             {"name": "skills", "label": "Skills", "label_es": "Habilidades", "type": "skills"},
             {"name": "experience", "label": "Experience", "label_es": "Experiencia", "type": "experience"},
             {"name": "projects", "label": "Featured Projects", "label_es": "Proyectos Destacados", "type": "projects"},

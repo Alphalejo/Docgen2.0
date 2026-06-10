@@ -4,16 +4,23 @@
 <meta charset="UTF-8">
 <title>{{ name | default('Resume') }} - {{ title | default('Curriculum Vitae') }}</title>
 <style>
+    /* Variables de tamaño de fuente */
+    :root {
+        --font-size-title: 26px;
+        --font-size-large: 13px;
+        --font-size-medium: 12px;
+        --font-size-small: 11px;
+    }
+
     @page {
         size: letter;
         margin: 20mm 15mm 20mm 15mm;
-        
     }
     body {
-        font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+        font-family: Calibri, 'Helvetica Neue', Arial, sans-serif;
         color: #333333;
         line-height: 1.4;
-        font-size: 11pt;
+        font-size: var(--font-size-medium);
         margin: 0;
         padding: 0;
     }
@@ -33,21 +40,21 @@
         margin-bottom: 18px;
     }
     .header h1 {
-        font-size: 26pt;
+        font-size: var(--font-size-title);
         margin: 0 0 4px 0;
         color: #1a5f7a;
         text-transform: uppercase;
         letter-spacing: 1px;
     }
     .header h2 {
-        font-size: 14pt;
+        font-size: var(--font-size-large);
         margin: 0 0 8px 0;
         color: #555555;
         font-weight: 600;
         letter-spacing: 0.5px;
     }
     .contact-info {
-        font-size: 9.5pt;
+        font-size: var(--font-size-small);
         color: #666666;
         display: flex;
         flex-wrap: wrap;
@@ -62,10 +69,10 @@
     /* Section Styles */
     .section {
         margin-bottom: 18px;
-        page-break-inside: avoid;
+        /*page-break-inside: avoid;*/
     }
     .section-title {
-        font-size: 12pt;
+        font-size: var(--font-size-large);
         font-weight: bold;
         color: #1a5f7a;
         text-transform: uppercase;
@@ -82,12 +89,13 @@
     /* Experience Styles */
     .job-entry {
         margin-bottom: 14px;
+        page-break-inside: avoid;
     }
     .job-header {
         display: flex;
         justify-content: space-between;
         font-weight: bold;
-        font-size: 11pt;
+        font-size: var(--font-size-medium);
         margin-bottom: 2px;
     }
     .job-company {
@@ -98,7 +106,7 @@
         justify-content: space-between;
         font-style: italic;
         color: #555555;
-        font-size: 10pt;
+        font-size: var(--font-size-medium);
         margin-bottom: 6px;
     }
     .project-entry {
@@ -107,16 +115,17 @@
     }
     .project-title {
         font-weight: bold;
-        font-size: 10.5pt;
+        font-size: var(--font-size-medium);
         color: #34495e;
         margin-bottom: 4px;
     }
     ul {
-        margin: 0 0 6px 0;
-        padding-left: 20px;
+        margin: 0 0 4px 0;
+        padding-left: 18px;
     }
     li {
-        margin-bottom: 4px;
+        margin-bottom: 0;
+        line-height: 1.4;
         text-align: justify;
     }
 
@@ -135,12 +144,12 @@
         width: 25%;
         padding-bottom: 6px;
         color: #444444;
-        font-size: 10pt;
+        font-size: var(--font-size-medium);
     }
     .skills-items {
         display: table-cell;
         padding-bottom: 6px;
-        font-size: 10pt;
+        font-size: var(--font-size-medium);
     }
     
     .education-container {
@@ -176,14 +185,11 @@
     </div>
 
     <div class="section">
-    <!-- SUMMARY -->
-    <!--<div class="section-title">{{ "Resumen" if doc_lang == "es" else "Summary" }}</div> -->
-        <p class="summary-text">
-            {{ summary | default('') }}
+    <p class="summary-text">
+            {{ summary | default('') | safe }}
         </p>
     </div>
 
-    <!-- EXPERIENCE -->
     <div class="section">
         <div class="section-title">{{ "Experiencia Profesional" if doc_lang == "es" else "Professional Experience" }}</div>
         {% for job in experience | default([]) %}
@@ -196,12 +202,11 @@
                 <span class="job-company">{{ job.company }}</span>
                 <span class="job-location">{{ job.location }}</span>
             </div>
-            <p style="margin:4px 0 0 0; text-align:justify;">{{ job.content | replace('\n', '<br>') | safe }}</p>
+            <div style="margin:4px 0 0 0; text-align:justify;">{{ job.content | trim | replace('\n\n', '<div style=\"margin-bottom:4px\"></div>') | replace('\n', ' ') | safe }}</div>
         </div>
         {% endfor %}
     </div>
 
-    <!-- SKILLS -->
     <div class="section">
     <div class="section-title">{{ "Habilidades" if doc_lang == "es" else "Skills" }}</div>
         <div class="skills-grid">
@@ -214,7 +219,6 @@
         </div>
     </div>
 
-    <!-- PROJECTS -->
     {% if projects %}
     <div class="section">
         <div class="section-title">{{ "Proyectos Destacados" if doc_lang == "es" else "Featured Projects" }}</div>
@@ -241,7 +245,6 @@
     </div>
     {% endif %}
 
-    <!-- EDUCATION -->
     <div class="section">
         <div class="section-title">{{ "Educación y Certificaciones" if doc_lang == "es" else "Education & Certifications" }}</div>
         <div class="education-container">
@@ -258,10 +261,9 @@
         </div>
     </div>
 
-    <!-- LANGUAGES -->
     <div class="section">
         <div class="section-title">{{ "Idiomas" if doc_lang == "es" else "Languages" }}</div>
-        <p style="margin:5px 0 0 0; font-size:10pt;">
+        <p style="margin:5px 0 0 0; font-size: var(--font-size-medium);">
             {{ languages | join(' | ') if languages is iterable and languages is not string else languages }}
         </p>
     </div>
