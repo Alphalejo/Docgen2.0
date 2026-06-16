@@ -202,7 +202,7 @@
                 <span class="job-company">{{ job.company }}</span>
                 <span class="job-location">{{ job.location }}</span>
             </div>
-            <div style="margin:4px 0 0 0; text-align:justify;">{{ job.content | trim | replace('\n\n', '<div style="margin-bottom:4px"></div>') | replace('\n', ' ') | safe }}</div>
+            <div style="margin:4px 0 0 0; text-align:justify;">{{ job.content | trim | replace('\n\n', '<div style="margin-bottom:4px"></div>') | replace('\n', '<div style="margin-bottom:0px"></div>') | safe }}</div>
         </div>
         {% endfor %}
     </div>
