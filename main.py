@@ -10,7 +10,6 @@ from fastapi.responses import HTMLResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel
-from weasyprint import HTML
 from docx import Document
 from fastapi.responses import Response
 
@@ -102,6 +101,9 @@ async def export_pdf(payload: PreviewRequest):
             job["content"] = highlight_paragraph_titles(job["content"])
 
     html_content = template.render(**data, doc_lang=payload.doc_lang)
+    if os.name == 'nt' and hasattr(os, 'add_dll_directory'):
+        os.add_dll_directory(r'C:\Program Files\Inkscape\bin')
+    from weasyprint import HTML
     pdf_bytes = HTML(string=html_content).write_pdf()
     
     return Response(
@@ -213,3 +215,7 @@ async def import_json(file: UploadFile = File(...)):
     content = await file.read()
     data = json.loads(content)
     return data
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="127.0.0.1", port=8000)
