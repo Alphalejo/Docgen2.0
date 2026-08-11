@@ -742,7 +742,9 @@ document.addEventListener("DOMContentLoaded", () => {
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement("a");
             a.href = url;
-            a.download = `${payload.template}_export_${Date.now()}.${extension}`;
+            const name = payload.data.name || "CV";
+            const title = payload.data.title || "Document";
+            a.download = `${name} - ${title}.${extension}`;
             document.body.appendChild(a);
             a.click();
             a.remove();

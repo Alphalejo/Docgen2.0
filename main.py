@@ -106,10 +106,13 @@ async def export_pdf(payload: PreviewRequest):
     from weasyprint import HTML
     pdf_bytes = HTML(string=html_content).write_pdf()
     
+    name = payload.data.get("name", "CV").strip()
+    title = payload.data.get("title", "CV").strip()
+
     return Response(
         content=pdf_bytes,
         media_type="application/pdf",
-        headers={"Content-Disposition": f"attachment; filename={payload.template}.pdf"}
+        headers={"Content-Disposition": f"attachment; filename={name} - {title}.pdf"}
     )
 
 @app.post("/export/docx")
@@ -206,7 +209,7 @@ async def export_docx(payload: PreviewRequest):
     return StreamingResponse(
         doc_io,
         media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-        headers={"Content-Disposition": f"attachment; filename={payload.template}.docx"}
+        headers={"Content-Disposition": f"attachment; filename= {data.get('name', 'CV')} - {data.get('title', 'CV')}.docx"}
     )
 
 @app.post("/import-json")
